@@ -1,8 +1,8 @@
 lane :test do
   amazon_app_submission(
     client_id: "<CLIENT_ID>",
-    client_secret: client_secret: "<CLIENT_SECRET>",
-    app_id: app_id: "<APP_ID>",
+    client_secret: "<CLIENT_SECRET>",
+    app_id: "<APP_ID>",
     apk_path: "<APK_PATH>"
   )
 end
