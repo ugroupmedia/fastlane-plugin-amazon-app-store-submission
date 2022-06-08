@@ -74,6 +74,24 @@ module Fastlane
         return current_edit['id'], res.header['ETag']
       end
 
+      def self.get_current_apk_etag(token, app_id, edit_id, apk_id)
+
+        get_apks_etag = "/v1/applications/#{app_id}/edits/#{edit_id}/apks/#{apk_id}"
+        get_apks_etag_url = BASE_URL + get_apks_etag
+
+        uri = URI(get_apks_etag_url)
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+        req = Net::HTTP::Get.new(
+            uri.path,
+            'Authorization' => token,
+            'Content-Type' => 'application/json'
+        )
+
+        res = http.request(req)
+        return res.header['ETag']
+      end
+
       def self.get_current_apk_id(token, app_id, edit_id)
 
         get_apks_path = "/v1/applications/#{app_id}/edits/#{edit_id}/apks"
@@ -97,15 +115,11 @@ module Fastlane
         end
       end
 
-      def self.replaceExistingApk(token, app_id, edit_id, eTag, apk_path)
+      def self.replaceExistingApk(token, app_id, edit_id, apk_id, eTag, apk_path)
 
         replace_apk_path = "/v1/applications/#{app_id}/edits/#{edit_id}/apks/#{apk_id}/replace"
         local_apk = File.open(apk_path, "r").read
-
-        UI.message("eTag #{eTag}")
-        
-        UI.message("replace_apk_path #{replace_apk_path}")
-      
+              
         replace_apk_url = BASE_URL + replace_apk_path
         uri = URI(replace_apk_url)
         http = Net::HTTP.new(uri.host, uri.port)
@@ -115,13 +129,12 @@ module Fastlane
             uri.path,
             'Authorization' => token,
             'Content-Type' => 'application/vnd.android.package-archive',
-            'fileName' => 'app-amazon-prod-release.apk',
             'If-Match' => eTag
             )
 
         req.body = local_apk
         res = http.request(req)
-        result_json = JSON.parse(res.body)
+        return res.code
       end
 
       def self.delete_apk(token, app_id, edit_id, apk_id, eTag)
@@ -159,11 +172,28 @@ module Fastlane
         req = Net::HTTP::Post.new(
             uri.path,
             'Authorization' => token,
-            'Content-Type' => 'application/vnd.android.package-archive',
-            'fileName' => 'app-amazon-prod-release.apk'
+            'Content-Type' => 'application/vnd.android.package-archive'
             )
 
         req.body = local_apk
+        res = http.request(req)
+        result_json = JSON.parse(res.body)
+      end
+
+      def self.commit_edit(token, app_id, edit_id, eTag)
+
+        commit_edit_path = "/v1/applications/#{app_id}/edits/#{edit_id}/commit" 
+        commit_edit_url = BASE_URL + commit_edit_path
+
+        uri = URI(commit_edit_url)
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+        req = Net::HTTP::Post.new(
+            uri.path,
+            'Authorization' => token,
+            'If-Match' => eTag
+            )
+
         res = http.request(req)
         result_json = JSON.parse(res.body)
       end

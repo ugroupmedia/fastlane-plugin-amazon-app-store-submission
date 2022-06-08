@@ -15,30 +15,22 @@ module Fastlane
           UI.message("the token is #{token}")
         end  
 
-        current_edit_id, eTag = Helper::AmazonAppSubmissionHelper.open_edit(token, params[:app_id])
+        current_edit_id, edit_eTag = Helper::AmazonAppSubmissionHelper.open_edit(token, params[:app_id])
         
         if current_edit_id.nil?
         Helper::AmazonAppSubmissionHelper.create_new_edit(token, params[:app_id])
-        current_edit_id, eTag = Helper::AmazonAppSubmissionHelper.open_edit(token, params[:app_id])
+        current_edit_id, edit_eTag = Helper::AmazonAppSubmissionHelper.open_edit(token, params[:app_id])
         end  
-
-        UI.message("the editId is #{current_edit_id}")
-
-
-        # replace_apk_response =  Helper::AmazonAppSubmissionHelper.replaceExistingApk(token, params[:app_id], current_edit_id, eTag, apk_path)
        
         current_apk_id = Helper::AmazonAppSubmissionHelper.get_current_apk_id(token, params[:app_id], current_edit_id)
 
-        if !current_apk_id.nil?
-        UI.message("current_apk_id is #{current_apk_id}")
+        current_apk_eTag = Helper::AmazonAppSubmissionHelper.get_current_apk_etag(token, params[:app_id], current_edit_id, current_apk_id)
 
-        delete_apk_response = Helper::AmazonAppSubmissionHelper.delete_apk(token, params[:app_id], current_edit_id, current_apk_id, eTag)
-        UI.message("delete_apk_response is #{delete_apk_response}")
-        end
+        replace_apk_response_code =  Helper::AmazonAppSubmissionHelper.replaceExistingApk(token, params[:app_id], current_edit_id, current_apk_id, current_apk_eTag,  params[:apk_path])
         
-        add_new_apk_response = Helper::AmazonAppSubmissionHelper.uploadNewApk(token, params[:app_id], current_edit_id, apk_path)
-
-        UI.message("add_new_apk_response is #{add_new_apk_response}")
+       if replace_apk_response_code === 200
+        Helper::AmazonAppSubmissionHelper.commit_edit(token, params[:app_id], current_edit_id, edit_eTag)
+       end 
 
       end
 
@@ -77,7 +69,7 @@ module Fastlane
                                     env_name: "AMAZON_APP_SUBMISSION_APP_ID",
                                  description: "Amazon App Submission APP ID",
                                     optional: false,
-                                        type: String)
+                                        type: String),
 
             FastlaneCore::ConfigItem.new(key: :apk_path,
                                     env_name: "AMAZON_APP_SUBMISSION_APK_PATH",
