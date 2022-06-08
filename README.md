@@ -17,6 +17,9 @@ Upload the apk to the Amazon Appstore using the [App Submission API](https://dev
 
 Following the [guide](https://developer.amazon.com/docs/app-submission-api/auth.html), you will need to generate `client_id` and `client_secret` to access the console in advance.
 
+For `app_id` you can get it from Amazon app dashboard
+Please set the apk path to `apk_path` field
+
 Call `amazon_app_submission` in your Fastfile.
 
 ```ruby
@@ -27,3 +30,10 @@ Call `amazon_app_submission` in your Fastfile.
     apk_path: "<APK_PATH>"
   )
 ```
+
+## Testing 
+
+For testing the plugin locally you have to get `client_id`, `client_secret`, `app_id` and `apk_path` in fastlane/Fastfile 
+please check Usage step to see how you can get them.
+
+Then call `bundle exec fastlane test` in your terminal
