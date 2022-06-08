@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'fastlane/plugin/amazon_app_submission/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'amazon_app_submission'
+  spec.name          = 'fastlane-plugin-amazon_app_submission'
   spec.version       = Fastlane::AmazonAppSubmission::VERSION
   spec.author        = 'mohammedhemaid'
   spec.email         = 'mohammed.hemaid@outlook.com'

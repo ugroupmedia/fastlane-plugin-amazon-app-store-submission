@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    amazon_app_submission (0.1.0)
+    fastlane-plugin-amazon_app_submission (0.1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -268,9 +268,9 @@ PLATFORMS
   universal-darwin-21
 
 DEPENDENCIES
-  amazon_app_submission!
   bundler
   fastlane (>= 2.206.0)
+  fastlane-plugin-amazon_app_submission!
   pry
   rake
   rspec
