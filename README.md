@@ -1,4 +1,4 @@
-# amazon-app-store-submission
+# amazon-app-submission
 
 ## Getting Started
 
@@ -8,7 +8,7 @@ This project is a [_fastlane_](https://github.com/fastlane/fastlane) plugin. To 
 fastlane add_plugin amazon_app_submission
 ```
 
-## About amazon_appstore
+## About amazon_app_submission
 
 Upload the apk to the Amazon Appstore using the [App Submission API](https://developer.amazon.com/docs/app-submission-api/overview.html).
 * App Submission API Reference is [App Submission RESTFUL API](https://developer.amazon.com/docs/app-submission-api/appsub-api-ref.html).
