@@ -1,4 +1,4 @@
-# amazon-app-submission
+# fastlane-plugin-amazon-app-submission
 
 ## Getting Started
 
@@ -10,7 +10,8 @@ fastlane add_plugin amazon_app_submission
 
 ## About amazon_app_submission
 
-Upload the apk to the Amazon Appstore using the [App Submission API](https://developer.amazon.com/docs/app-submission-api/overview.html).
+* Project link on rubygems [fastlane-plugin-amazon_app_submission](https://rubygems.org/gems/fastlane-plugin-amazon_app_submission)
+* Upload the apk to the Amazon Appstore using the [App Submission API](https://developer.amazon.com/docs/app-submission-api/overview.html).
 * App Submission API Reference is [App Submission RESTFUL API](https://developer.amazon.com/docs/app-submission-api/appsub-api-ref.html).
 
 ## Usage
@@ -27,9 +28,37 @@ Call `amazon_app_submission` in your Fastfile.
     client_id: "<CLIENT_ID>",
     client_secret: "<CLIENT_SECRET>",
     app_id: "<APP_ID>",
-    apk_path: "<APK_PATH>"
+    apk_path: "<APK_PATH>",
+    # Optional
+    changelogs_folder_path:  "<CHANGELOG_PATH>",
+    upload_changelogs: false,
+    submit_for_review: false
   )
 ```
+
+| param | default value | optional | description 
+|:----------|:-----------:|:-----------:|:-----------:|
+client_id | - | false | getting client id from Amazon developer console dashboard 
+client_secret | - | false | getting client secret from Amazon developer console dashboard 
+app_id | - | false | getting app id from Amazon developer console dashboard 
+apk_path | - | false | link where you storing the release apk 
+changelogs_folder_path | "" | true | setting the folder path where you have the change logs with different file for each language, if language file not found it will use default.txt
+upload_changelogs | false | true | updating the change logs for the upcoming version
+submit_for_review | false | true | submit the uploaded APK to the store  
+
+* changelogs folder files name should be:
+
+| Language | File name
+|:----------|:-----------:|
+English-US | en-US.txt
+English-British | en-GB.txt
+English-Australia | en-AU.txt
+English-India | en-IN.txt
+Italian |it-IT.txt
+French | fr-FR.txt
+Spanish | es-ES.txt
+Spanish-Mexican | es-MX.txt
+Other | default.txt  
 
 ## Testing 
 
