@@ -1,4 +1,4 @@
-  require 'fastlane/action'
+require 'fastlane/action'
 require_relative '../helper/amazon_app_submission_helper'
 
 module Fastlane
@@ -11,31 +11,45 @@ module Fastlane
 
         if token.nil?
           UI.message("Cannot retrieve token, please check your client ID and client secret")
-        else
-          UI.message("the token is #{token}")
         end  
 
+        UI.message("Getting current edit")
         current_edit_id, edit_eTag = Helper::AmazonAppSubmissionHelper.open_edit(token, params[:app_id])
         
         if current_edit_id.nil?
+        UI.message("Current edit not found, creating a new edit")
         Helper::AmazonAppSubmissionHelper.create_new_edit(token, params[:app_id])
         current_edit_id, edit_eTag = Helper::AmazonAppSubmissionHelper.open_edit(token, params[:app_id])
         end  
        
+        UI.message("Get current apk id")
         current_apk_id = Helper::AmazonAppSubmissionHelper.get_current_apk_id(token, params[:app_id], current_edit_id)
 
+        UI.message("Get current apk ETag")
         current_apk_eTag = Helper::AmazonAppSubmissionHelper.get_current_apk_etag(token, params[:app_id], current_edit_id, current_apk_id)
 
-        replace_apk_response_code =  Helper::AmazonAppSubmissionHelper.replaceExistingApk(token, params[:app_id], current_edit_id, current_apk_id, current_apk_eTag,  params[:apk_path])
-        
-       if replace_apk_response_code === 200
-        Helper::AmazonAppSubmissionHelper.commit_edit(token, params[:app_id], current_edit_id, edit_eTag)
-       end 
+        UI.message("Replacing the apk with ETag #{current_apk_eTag}")
+        replace_apk_response_code, replace_apk_response =  Helper::AmazonAppSubmissionHelper.replaceExistingApk(token, params[:app_id], current_edit_id, current_apk_id, current_apk_eTag,  params[:apk_path])
 
+        if params[:upload_changelogs]
+          UI.message("Updating the changelogs")
+          Helper::AmazonAppSubmissionHelper.update_listings( token, params[:app_id],current_edit_id, params[:changelogs_path], params[:changelogs_path])
+        end
+        
+        if replace_apk_response_code == '200' 
+          if params[:submit_for_review] 
+             UI.message("Submitting to Amazon app store")
+              Helper::AmazonAppSubmissionHelper.commit_edit(token, params[:app_id], current_edit_id, edit_eTag)
+           end 
+        else
+          UI.message("Amazon app submission failed at replacing the apk error code #{replace_apk_response_code} and error respones #{replace_apk_response}")
+          return
+        end
+        UI.message("Amazon app submission finished successfully!")
       end
 
       def self.description
-        "test"
+        "fast-lane plugin for Amazon App Submissions"
       end
 
       def self.authors
@@ -48,7 +62,7 @@ module Fastlane
 
       def self.details
         # Optional:
-        "test"
+        "fast-lane plugin for Amazon App Submissions"
       end
 
       def self.available_options
@@ -75,8 +89,29 @@ module Fastlane
                                     env_name: "AMAZON_APP_SUBMISSION_APK_PATH",
                                  description: "Amazon App Submission APK Path",
                                     optional: false,
-                                        type: String)
-  
+                                        type: String),
+
+            FastlaneCore::ConfigItem.new(key: :changelogs_path,
+                                    env_name: "AMAZON_APP_SUBMISSION_CHANGELOGS_PATH",
+                                 description: "Amazon App Submission changelogs path",
+                               default_value: "",
+                                    optional: true,
+                                        type: String),
+
+            FastlaneCore::ConfigItem.new(key: :upload_changelogs,
+                                    env_name: "AMAZON_APP_SUBMISSION_SKIP_UPLOAD_CHANGELOGS",
+                                 description: "Amazon App Submission skip upload changelogs",
+                               default_value: false,
+                                    optional: true,
+                                        type: Boolean),            
+
+            FastlaneCore::ConfigItem.new(key: :submit_for_review,
+                                    env_name: "AMAZON_APP_SUBMISSION_SUBMIT_FOR_REVIEW",
+                                 description: "Amazon App Submission submit for review",
+                               default_value: false,
+                                    optional: true,
+                                        type: Boolean)    
+
           # FastlaneCore::ConfigItem.new(key: :your_option,
           #                         env_name: "AMAZON_APP_SUBMISSION_YOUR_OPTION",
           #                      description: "A description of your option",
