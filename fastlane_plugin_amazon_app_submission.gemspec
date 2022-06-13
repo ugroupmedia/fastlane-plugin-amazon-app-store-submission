@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email         = 'mohammed.hemaid@outlook.com'
 
   spec.summary       = 'This is the first version of the Amazon App Submission'
-  # spec.homepage      = "https://github.com/amazon-app-store-submission/amazon-app-store-submission"
+  spec.homepage      = "https://github.com/ugroupmedia/fastlane-plugin-amazon-app-store-submission"
   spec.license       = "MIT"
 
   spec.files         = Dir["lib/**/*"] + %w(README.md LICENSE)
