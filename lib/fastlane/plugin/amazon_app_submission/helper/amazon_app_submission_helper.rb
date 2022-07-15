@@ -23,12 +23,16 @@ module Fastlane
         res = http.request(req)
         result_json = JSON.parse(res.body)
         auth_token = "Bearer #{result_json['access_token']}"
-        
+
+        if result_json['error'] == 'invalid_scope'
+          UI.message("It seems that the provided security profile is not attached to the App Submission API")
+        end
+
         return auth_token
       end
 
       def self.create_new_edit(token, app_id)
-        
+
         create_edit_path = "/v1/applications/#{app_id}/edits"
         create_edit_url = BASE_URL + create_edit_path
 
@@ -46,9 +50,9 @@ module Fastlane
 
         return current_edit['id']
       end
-      
+
       def self.open_edit(token, app_id)
-        
+
         get_edit_path = "/v1/applications/#{app_id}/edits"
         get_edit_url = BASE_URL + get_edit_path
 
@@ -82,7 +86,7 @@ module Fastlane
         )
 
         res = http.request(req)
-        if !res.body.nil? 
+        if !res.body.nil?
         apks = JSON.parse(res.body)
         firstAPK = apks[0]
         apk_id = firstAPK['id']
@@ -112,7 +116,7 @@ module Fastlane
 
         replace_apk_path = "/v1/applications/#{app_id}/edits/#{edit_id}/apks/#{apk_id}/replace"
         local_apk = File.open(apk_path, "r").read
-              
+
         apk_uri = URI.parse(apk_path)
         apk_name = apk_uri.path.split('/').last
 
@@ -143,7 +147,7 @@ module Fastlane
 
       def self.delete_apk(token, app_id, edit_id, apk_id, eTag)
 
-        delete_apk_path = "/v1/applications/#{app_id}/edits/#{edit_id}/apks/#{apk_id}" 
+        delete_apk_path = "/v1/applications/#{app_id}/edits/#{edit_id}/apks/#{apk_id}"
         delete_apk_url = BASE_URL + delete_apk_path
 
         uri = URI(delete_apk_url)
@@ -162,7 +166,7 @@ module Fastlane
 
       def self.uploadNewApk(token, app_id, edit_id, apk_path)
 
-        add_apk_path = "/v1/applications/#{app_id}/edits/#{edit_id}/apks/upload" 
+        add_apk_path = "/v1/applications/#{app_id}/edits/#{edit_id}/apks/upload"
         add_apk_url = BASE_URL + add_apk_path
         local_apk = File.open(apk_path, 'r').read
 
@@ -203,7 +207,7 @@ module Fastlane
         listings_response['listings'].each do |lang, listing|
         lang_path = "/v1/applications/#{app_id}/edits/#{edit_id}/listings/#{lang}"
         lang_url = BASE_URL + lang_path
-  
+
         uri = URI(lang_url)
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
@@ -225,7 +229,7 @@ module Fastlane
 
         update_listings_path = "/v1/applications/#{app_id}/edits/#{edit_id}/listings/#{lang}"
         update_listings_url = BASE_URL + update_listings_path
-  
+
         uri = URI(update_listings_url)
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
@@ -235,7 +239,7 @@ module Fastlane
             'Content-Type' => 'application/json',
             'If-Match' => etag
         )
-        
+
         req.body = listing.to_json
         res = http.request(req)
         listings_response = JSON.parse(res.body)
@@ -264,7 +268,7 @@ module Fastlane
 
       def self.commit_edit(token, app_id, edit_id, eTag)
 
-        commit_edit_path = "/v1/applications/#{app_id}/edits/#{edit_id}/commit" 
+        commit_edit_path = "/v1/applications/#{app_id}/edits/#{edit_id}/commit"
         commit_edit_url = BASE_URL + commit_edit_path
 
         uri = URI(commit_edit_url)
