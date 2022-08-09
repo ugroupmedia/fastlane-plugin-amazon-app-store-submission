@@ -21,6 +21,11 @@ module Fastlane
         Helper::AmazonAppSubmissionHelper.create_new_edit(token, params[:app_id])
         current_edit_id, edit_eTag = Helper::AmazonAppSubmissionHelper.open_edit(token, params[:app_id])
         end  
+
+        if current_edit_id.nil?
+        UI.error("Creating new edit failed!")
+        return
+        end
        
         UI.message("Get current apk id")
         current_apk_id = Helper::AmazonAppSubmissionHelper.get_current_apk_id(token, params[:app_id], current_edit_id)
