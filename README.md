@@ -30,7 +30,7 @@ Call `amazon_app_submission` in your Fastfile.
     app_id: "<APP_ID>",
     apk_path: "<APK_PATH>",
     # Optional
-    changelogs_folder_path:  "<CHANGELOG_PATH>",
+    changelogs_path:  "<CHANGELOG_PATH>",
     upload_changelogs: false,
     submit_for_review: false
   )
@@ -42,7 +42,7 @@ client_id | - | false | getting client id from Amazon developer console dashboar
 client_secret | - | false | getting client secret from Amazon developer console dashboard 
 app_id | - | false | getting app id from Amazon developer console dashboard 
 apk_path | - | false | link where you storing the release apk 
-changelogs_folder_path | "" | true | setting the folder path where you have the change logs with different file for each language, if language file not found it will use default.txt
+changelogs_path | "" | true | setting the folder path where you have the change logs with different file for each language, if language file not found it will use default.txt
 upload_changelogs | false | true | updating the change logs for the upcoming version
 submit_for_review | false | true | submit the uploaded APK to the store  
 
