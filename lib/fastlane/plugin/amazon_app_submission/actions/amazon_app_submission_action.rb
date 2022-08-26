@@ -53,7 +53,7 @@ module Fastlane
       end
 
       def self.description
-        "fast-lane plugin for Amazon App Submissions"
+        "Fastlane plugin for Amazon App Submissions"
       end
 
       def self.authors
@@ -66,7 +66,7 @@ module Fastlane
 
       def self.details
         # Optional:
-        "fast-lane plugin for Amazon App Submissions"
+        "Fastlane plugin for Amazon App Submissions"
       end
 
       def self.available_options
