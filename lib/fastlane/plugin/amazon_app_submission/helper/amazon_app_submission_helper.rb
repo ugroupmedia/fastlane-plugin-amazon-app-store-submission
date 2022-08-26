@@ -87,10 +87,10 @@ module Fastlane
 
         res = http.request(req)
         if !res.body.nil?
-        apks = JSON.parse(res.body)
-        firstAPK = apks[0]
-        apk_id = firstAPK['id']
-        return apk_id
+          apks = JSON.parse(res.body)
+          firstAPK = apks.kind_of?(Array) ? apks[0] : apks
+          apk_id = firstAPK['id']
+          return apk_id
         end
       end
 
