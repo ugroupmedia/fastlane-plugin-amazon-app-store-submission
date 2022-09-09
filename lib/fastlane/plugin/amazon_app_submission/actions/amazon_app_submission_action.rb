@@ -34,7 +34,7 @@ module Fastlane
           UI.message("Get current apk ETag")
           current_apk_eTag = Helper::AmazonAppSubmissionHelper.get_current_apk_etag(token, params[:app_id], current_edit_id, current_apk_id)
 
-          UI.message("Replacing the apk with ETag #{current_apk_eTag}")
+          UI.message("Replacing the apk with apk from #{params[:apk_path]}")
           replace_apk_response_code, replace_apk_response =  Helper::AmazonAppSubmissionHelper.replaceExistingApk(token, params[:app_id], current_edit_id, current_apk_id, current_apk_eTag, params[:apk_path])
         end
 
