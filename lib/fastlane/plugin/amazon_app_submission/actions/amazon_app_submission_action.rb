@@ -20,6 +20,11 @@ module Fastlane
         UI.message("Current edit not found, creating a new edit")
         Helper::AmazonAppSubmissionHelper.create_new_edit(token, params[:app_id])
         current_edit_id, edit_eTag = Helper::AmazonAppSubmissionHelper.open_edit(token, params[:app_id])
+        end  
+
+        if current_edit_id.nil?
+        UI.error("Creating new edit failed!")
+        return
         end
 
         if params[:upload_apk]

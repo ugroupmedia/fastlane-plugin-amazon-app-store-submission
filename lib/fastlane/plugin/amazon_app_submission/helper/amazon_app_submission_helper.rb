@@ -46,8 +46,11 @@ module Fastlane
         )
 
         res = http.request(req)
-        current_edit = JSON.parse(res.body)
+        unless res.kind_of? Net::HTTPSuccess
+          raise res.body
+        end
 
+        current_edit = JSON.parse(res.body)
         return current_edit['id']
       end
 
