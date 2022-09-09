@@ -3,8 +3,9 @@ lane :test do
     client_id: "<CLIENT_ID>",
     client_secret: "<CLIENT_SECRET>",
     app_id: "<APP_ID>",
-    apk_path: "<APK_PATH>",
     # Optional
+    apk_path: "<APK_PATH>",
+    upload_apk: true,
     changelogs_path: "<CHANGELOG_PATH>",
     upload_changelogs: false,
     submit_for_review: false,
