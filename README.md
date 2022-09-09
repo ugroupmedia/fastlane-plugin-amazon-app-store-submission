@@ -28,20 +28,22 @@ Call `amazon_app_submission` in your Fastfile.
     client_id: "<CLIENT_ID>",
     client_secret: "<CLIENT_SECRET>",
     app_id: "<APP_ID>",
-    apk_path: "<APK_PATH>",
     # Optional
+    apk_path: "<APK_PATH>",
+    upload_apk: true,
     changelogs_folder_path:  "<CHANGELOG_PATH>",
     upload_changelogs: false,
     submit_for_review: false
   )
 ```
 
-| param | default value | optional | description 
+| param | default value | optional | description
 |:----------|:-----------:|:-----------:|:-----------:|
-client_id | - | false | getting client id from Amazon developer console dashboard 
-client_secret | - | false | getting client secret from Amazon developer console dashboard 
-app_id | - | false | getting app id from Amazon developer console dashboard 
-apk_path | - | false | link where you storing the release apk 
+client_id | - | false | getting client id from Amazon developer console dashboard
+client_secret | - | false | getting client secret from Amazon developer console dashboard
+app_id | - | false | getting app id from Amazon developer console dashboard
+apk_path | - | true | link where you storing the release apk
+upload_apk  | true  | true  | set this to false to not upload an apk. can be used to only upload changelogs
 changelogs_folder_path | "" | true | setting the folder path where you have the change logs with different file for each language, if language file not found it will use default.txt
 upload_changelogs | false | true | updating the change logs for the upcoming version
 submit_for_review | false | true | submit the uploaded APK to the store  
@@ -60,9 +62,9 @@ Spanish | es-ES.txt
 Spanish-Mexican | es-MX.txt
 Other | default.txt  
 
-## Testing 
+## Testing
 
-For testing the plugin locally you have to get `client_id`, `client_secret`, `app_id` and `apk_path` in fastlane/Fastfile 
+For testing the plugin locally you have to get `client_id`, `client_secret`, `app_id` and `apk_path` in fastlane/Fastfile
 please check Usage step to see how you can get them.
 
 Then call `bundle exec fastlane test` in your terminal
