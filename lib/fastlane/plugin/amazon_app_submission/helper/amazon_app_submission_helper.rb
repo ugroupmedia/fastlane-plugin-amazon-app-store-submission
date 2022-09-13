@@ -47,7 +47,7 @@ module Fastlane
 
         res = http.request(req)
         current_edit = JSON.parse(res.body)
-        
+
         return current_edit['id']
       end
 
@@ -112,7 +112,7 @@ module Fastlane
         return res.header['ETag']
       end
 
-      def self.replaceExistingApk(token, app_id, edit_id, apk_id, eTag, apk_path, should_retry = true)
+      def self.replace_existing_apk(token, app_id, edit_id, apk_id, eTag, apk_path, should_retry = true)
 
         replace_apk_path = "/v1/applications/#{app_id}/edits/#{edit_id}/apks/#{apk_id}/replace"
         local_apk = File.open(apk_path, "r").read
@@ -139,7 +139,7 @@ module Fastlane
         # Retry again if replace failed
         if res.code == '412' && should_retry
           UI.message("replacing the apk failed, retrying uploading it again...")
-          replaceExistingApk(token, app_id, edit_id, apk_id, eTag, apk_path, false)
+          replace_existing_apk(token, app_id, edit_id, apk_id, eTag, apk_path, false)
           return
         end
         return res.code, replace_apk_response
@@ -164,7 +164,7 @@ module Fastlane
         result_json = JSON.parse(res.body)
       end
 
-      def self.uploadNewApk(token, app_id, edit_id, apk_path)
+      def self.upload_new_apk(token, app_id, edit_id, apk_path)
 
         add_apk_path = "/v1/applications/#{app_id}/edits/#{edit_id}/apks/upload"
         add_apk_url = BASE_URL + add_apk_path
