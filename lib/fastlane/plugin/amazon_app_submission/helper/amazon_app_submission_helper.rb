@@ -25,8 +25,9 @@ module Fastlane
         auth_token = "Bearer #{result_json['access_token']}"
 
         if result_json['error'] == 'invalid_scope'
-          UI.message("It seems that the provided security profile is not attached to the App Submission API")
+          UI.crash!("It seems that the provided security profile is not attached to the App Submission API")
         end
+        UI.crash!(res.body) unless res.code == '200'
 
         return auth_token
       end
@@ -46,8 +47,9 @@ module Fastlane
         )
 
         res = http.request(req)
+        UI.crash!(res.body) unless res.code == '200'
         current_edit = JSON.parse(res.body)
-        
+
         return current_edit['id']
       end
 
@@ -86,6 +88,7 @@ module Fastlane
         )
 
         res = http.request(req)
+
         if !res.body.nil?
           apks = JSON.parse(res.body)
           firstAPK = apks.kind_of?(Array) ? apks[0] : apks
@@ -109,10 +112,11 @@ module Fastlane
         )
 
         res = http.request(req)
+        UI.crash!(res.body) unless res.code == '200'
         return res.header['ETag']
       end
 
-      def self.replaceExistingApk(token, app_id, edit_id, apk_id, eTag, apk_path, should_retry = true)
+      def self.replaceExistingApk(token, app_id, edit_id, apk_id, eTag, apk_path, transport_timeout, should_retry = true)
 
         replace_apk_path = "/v1/applications/#{app_id}/edits/#{edit_id}/apks/#{apk_id}/replace"
         local_apk = File.open(apk_path, "r").read
@@ -124,7 +128,8 @@ module Fastlane
         uri = URI(replace_apk_url)
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
-        http.write_timeout = 1000
+        http.write_timeout = transport_timeout
+        http.read_timeout = transport_timeout
         req = Net::HTTP::Put.new(
             uri.path,
             'Authorization' => token,
@@ -135,12 +140,13 @@ module Fastlane
 
         req.body = local_apk
         res = http.request(req)
+        
         replace_apk_response = JSON.parse(res.body)
         # Retry again if replace failed
         if res.code == '412' && should_retry
-          UI.message("replacing the apk failed, retrying uploading it again...")
-          replaceExistingApk(token, app_id, edit_id, apk_id, eTag, apk_path, false)
-          return
+          UI.important("replacing the apk failed, retrying uploading it again...")
+          retry_code, retry_res = replaceExistingApk(token, app_id, edit_id, apk_id, eTag, apk_path, transport_timeout, false)
+          UI.crash!(retry_res) unless retry_code == '200'
         end
         return res.code, replace_apk_response
       end
@@ -161,10 +167,11 @@ module Fastlane
             )
 
         res = http.request(req)
+        UI.crash!(res.body) unless res.code == '200'
         result_json = JSON.parse(res.body)
       end
 
-      def self.uploadNewApk(token, app_id, edit_id, apk_path)
+      def self.uploadNewApk(token, app_id, edit_id, apk_path, transport_timeout)
 
         add_apk_path = "/v1/applications/#{app_id}/edits/#{edit_id}/apks/upload"
         add_apk_url = BASE_URL + add_apk_path
@@ -173,8 +180,8 @@ module Fastlane
         uri = URI(add_apk_url)
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
-        http.write_timeout = 1000
-        http.read_timeout = 1000
+        http.write_timeout = transport_timeout
+        http.read_timeout = transport_timeout
         req = Net::HTTP::Post.new(
             uri.path,
             'Authorization' => token,
@@ -183,6 +190,7 @@ module Fastlane
 
         req.body = local_apk
         res = http.request(req)
+        UI.crash!(res.body) unless res.code == '200'
         result_json = JSON.parse(res.body)
       end
 
@@ -201,6 +209,7 @@ module Fastlane
         )
 
         res = http.request(req)
+        UI.crash!(res.body) unless res.code == '200'
         listings_response = JSON.parse(res.body)
 
         # Iterating over the languages for getting the ETag.
@@ -217,6 +226,7 @@ module Fastlane
               'Content-Type' => 'application/json'
           )
         etag_response = http.request(req)
+        UI.crash!(etag_response) unless etag_response.code == '200'
         etag = etag_response.header['Etag']
 
         recent_changes = find_changelog(
@@ -242,6 +252,7 @@ module Fastlane
 
         req.body = listing.to_json
         res = http.request(req)
+        UI.crash!(res.body) unless res.code == '200'
         listings_response = JSON.parse(res.body)
         end
       end
@@ -281,6 +292,7 @@ module Fastlane
             )
 
         res = http.request(req)
+        UI.crash!(res.body) unless res.code == '200'
         result_json = JSON.parse(res.body)
       end
     end
