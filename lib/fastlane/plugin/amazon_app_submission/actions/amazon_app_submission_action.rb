@@ -33,13 +33,13 @@ module Fastlane
 
           if current_apk_id.nil?
             UI.message("No apk found. Uploading new apk.")
-            Helper::AmazonAppSubmissionHelper.uploadNewApk(token, params[:app_id], current_edit_id, params[:apk_path], params[:read_timeout], params[:write_timeout])
+            Helper::AmazonAppSubmissionHelper.uploadNewApk(token, params[:app_id], current_edit_id, params[:apk_path], params[:transport_timeout])
           else
             UI.message("Get current apk ETag")
             current_apk_eTag = Helper::AmazonAppSubmissionHelper.get_current_apk_etag(token, params[:app_id], current_edit_id, current_apk_id)
 
             UI.message("Replacing the apk with apk from #{params[:apk_path]}")
-            Helper::AmazonAppSubmissionHelper.replaceExistingApk(token, params[:app_id], current_edit_id, current_apk_id, current_apk_eTag, params[:apk_path], params[:read_timeout], params[:write_timeout])
+            Helper::AmazonAppSubmissionHelper.replaceExistingApk(token, params[:app_id], current_edit_id, current_apk_id, current_apk_eTag, params[:apk_path], params[:transport_timeout])
           end
         end
 
@@ -128,19 +128,13 @@ module Fastlane
                                     optional: true,
                                         type: Boolean),
 
-            FastlaneCore::ConfigItem.new(key: :read_timeout,
-                                    env_name: "AMAZON_APP_SUBMISSION_READ_TIMEOUT",
-                                 description: "Read timeout in seconds for the apk upload process",
+            FastlaneCore::ConfigItem.new(key: :transport_timeout,
+                                    env_name: "AMAZON_APP_SUBMISSION_TRANSPORT_TIMEOUT",
+                                 description: "Read/write timeout in seconds for the apk upload process",
                                default_value: 1000,
                                     optional: true,
                                         type: Fixnum),
 
-            FastlaneCore::ConfigItem.new(key: :write_timeout,
-                                    env_name: "AMAZON_APP_SUBMISSION_WRITE_TIMEOUT",
-                                 description: "Write timeout in seconds for the apk upload process",
-                               default_value: 1000,
-                                    optional: true,
-                                        type: Fixnum)
 
           # FastlaneCore::ConfigItem.new(key: :your_option,
           #                         env_name: "AMAZON_APP_SUBMISSION_YOUR_OPTION",

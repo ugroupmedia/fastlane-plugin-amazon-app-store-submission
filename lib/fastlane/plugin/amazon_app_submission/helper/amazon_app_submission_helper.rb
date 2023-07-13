@@ -116,7 +116,7 @@ module Fastlane
         return res.header['ETag']
       end
 
-      def self.replaceExistingApk(token, app_id, edit_id, apk_id, eTag, apk_path, read_timeout, write_timeout, should_retry = true)
+      def self.replaceExistingApk(token, app_id, edit_id, apk_id, eTag, apk_path, transport_timeout, should_retry = true)
 
         replace_apk_path = "/v1/applications/#{app_id}/edits/#{edit_id}/apks/#{apk_id}/replace"
         local_apk = File.open(apk_path, "r").read
@@ -128,8 +128,8 @@ module Fastlane
         uri = URI(replace_apk_url)
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
-        http.write_timeout = write_timeout
-        http.read_timeout = read_timeout
+        http.write_timeout = transport_timeout
+        http.read_timeout = transport_timeout
         req = Net::HTTP::Put.new(
             uri.path,
             'Authorization' => token,
@@ -145,7 +145,7 @@ module Fastlane
         # Retry again if replace failed
         if res.code == '412' && should_retry
           UI.important("replacing the apk failed, retrying uploading it again...")
-          retry_code, retry_res = replaceExistingApk(token, app_id, edit_id, apk_id, eTag, apk_path, read_timeout, write_timeout, false)
+          retry_code, retry_res = replaceExistingApk(token, app_id, edit_id, apk_id, eTag, apk_path, transport_timeout, false)
           UI.crash!(retry_res) unless retry_code == '200'
         end
         return res.code, replace_apk_response
@@ -171,7 +171,7 @@ module Fastlane
         result_json = JSON.parse(res.body)
       end
 
-      def self.uploadNewApk(token, app_id, edit_id, apk_path, read_timeout, write_timeout)
+      def self.uploadNewApk(token, app_id, edit_id, apk_path, transport_timeout)
 
         add_apk_path = "/v1/applications/#{app_id}/edits/#{edit_id}/apks/upload"
         add_apk_url = BASE_URL + add_apk_path
@@ -180,8 +180,8 @@ module Fastlane
         uri = URI(add_apk_url)
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
-        http.write_timeout = write_timeout
-        http.read_timeout = read_timeout
+        http.write_timeout = transport_timeout
+        http.read_timeout = transport_timeout
         req = Net::HTTP::Post.new(
             uri.path,
             'Authorization' => token,
