@@ -25,8 +25,9 @@ module Fastlane
         auth_token = "Bearer #{result_json['access_token']}"
 
         if result_json['error'] == 'invalid_scope'
-          UI.message("It seems that the provided security profile is not attached to the App Submission API")
+          UI.crash!("It seems that the provided security profile is not attached to the App Submission API")
         end
+        UI.crash!(res.body) unless res.code == '200'
 
         return auth_token
       end
@@ -46,7 +47,7 @@ module Fastlane
         )
 
         res = http.request(req)
-        UI.error(res.body) unless res.code == '200'
+        UI.crash!(res.body) unless res.code == '200'
         current_edit = JSON.parse(res.body)
 
         return current_edit['id']
@@ -67,7 +68,6 @@ module Fastlane
         )
 
         res = http.request(req)
-        UI.error(res.body) unless res.code == '200'
         current_edit = JSON.parse(res.body)
 
         return current_edit['id'], res.header['ETag']
@@ -88,7 +88,6 @@ module Fastlane
         )
 
         res = http.request(req)
-        UI.error(res.body) unless res.code == '200'
 
         if !res.body.nil?
           apks = JSON.parse(res.body)
@@ -113,7 +112,7 @@ module Fastlane
         )
 
         res = http.request(req)
-        UI.error(res.body) unless res.code == '200'
+        UI.crash!(res.body) unless res.code == '200'
         return res.header['ETag']
       end
 
@@ -143,12 +142,11 @@ module Fastlane
         res = http.request(req)
         
         replace_apk_response = JSON.parse(res.body)
-        UI.error(res.body) unless res.code == '200'
         # Retry again if replace failed
         if res.code == '412' && should_retry
-          UI.message("replacing the apk failed, retrying uploading it again...")
-          replaceExistingApk(token, app_id, edit_id, apk_id, eTag, apk_path, false)
-          return
+          UI.important("replacing the apk failed, retrying uploading it again...")
+          retry_code, retry_res = replaceExistingApk(token, app_id, edit_id, apk_id, eTag, apk_path, read_timeout, write_timeout, false)
+          UI.crash!(retry_res) unless retry_code == '200'
         end
         return res.code, replace_apk_response
       end
@@ -169,6 +167,7 @@ module Fastlane
             )
 
         res = http.request(req)
+        UI.crash!(res.body) unless res.code == '200'
         result_json = JSON.parse(res.body)
       end
 
@@ -191,7 +190,7 @@ module Fastlane
 
         req.body = local_apk
         res = http.request(req)
-        UI.error(res.body) unless res.code == '200'
+        UI.crash!(res.body) unless res.code == '200'
         result_json = JSON.parse(res.body)
       end
 
@@ -210,7 +209,7 @@ module Fastlane
         )
 
         res = http.request(req)
-        UI.error(res.body) unless res.code == '200'
+        UI.crash!(res.body) unless res.code == '200'
         listings_response = JSON.parse(res.body)
 
         # Iterating over the languages for getting the ETag.
@@ -227,7 +226,7 @@ module Fastlane
               'Content-Type' => 'application/json'
           )
         etag_response = http.request(req)
-        UI.error(etag_response) unless etag_response.code == '200'
+        UI.crash!(etag_response) unless etag_response.code == '200'
         etag = etag_response.header['Etag']
 
         recent_changes = find_changelog(
@@ -253,7 +252,7 @@ module Fastlane
 
         req.body = listing.to_json
         res = http.request(req)
-        UI.error(res.body) unless res.code == '200'
+        UI.crash!(res.body) unless res.code == '200'
         listings_response = JSON.parse(res.body)
         end
       end
@@ -293,7 +292,7 @@ module Fastlane
             )
 
         res = http.request(req)
-        UI.error(res.body) unless res.code == '200'
+        UI.crash!(res.body) unless res.code == '200'
         result_json = JSON.parse(res.body)
       end
     end
