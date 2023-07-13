@@ -33,7 +33,9 @@ Call `amazon_app_submission` in your Fastfile.
     upload_apk: true,
     changelogs_path:  "<CHANGELOG_PATH>",
     upload_changelogs: false,
-    submit_for_review: false
+    submit_for_review: false,
+    read_timeout: 1000,
+    write_timeout: 1000,
   )
 ```
 
@@ -47,6 +49,8 @@ upload_apk  | true  | true  | set this to false to not upload an apk. can be use
 changelogs_path | "" | true | setting the folder path where you have the change logs with different file for each language, if language file not found it will use default.txt
 upload_changelogs | false | true | updating the change logs for the upcoming version
 submit_for_review | false | true | submit the uploaded APK to the store  
+read_timeout | 1000 | true | read timeout in seconds for the apk upload process
+submit_for_review | 1000 | true | write timeout in seconds for the apk upload process
 
 * changelogs folder files name should be:
 
